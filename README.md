@@ -4,7 +4,7 @@
 
 **From the director's chair to the terminal.**
 
-🎬 B.A. in Radio & Television Directing, **Communication University of China** &nbsp;·&nbsp; 💻 M.S. in Software Engineering, **UC Irvine**
+🎬 B.A. in Broadcasting & TV Editing, **Communication University of China** &nbsp;·&nbsp; 💻 M.S. in Software Engineering, **UC Irvine**
 
 [![Half&Half](https://img.shields.io/badge/Half%26Half-Music%20Player-c7a555?style=for-the-badge&logo=webrtc&logoColor=white)](https://github.com/Karry1123/Half-Half-Music-Player)
 [![DingLong Mahjong](https://img.shields.io/badge/%E9%A1%B6%E9%BE%99%E9%BA%BB%E5%B0%86-Mahjong-184c43?style=for-the-badge&logo=vuedotjs&logoColor=white)](https://github.com/Karry1123/DingLongMahjong)
