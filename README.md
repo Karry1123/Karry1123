@@ -17,18 +17,18 @@
 ## 🎞️ Scene 1 — Who I am
 
 ```text
-   ┌─────────────────────────────────────────────────────────────┐
-   │  ACT I   Communication University of China                   │
-   │          TV Editing & Directing · Omni-media Photography     │
-   │          → learned how to frame a story for an audience      │
-   │                                                               │
-   │  ACT II  University of California, Irvine                     │
-   │          Master of Software Engineering (MSWE)                │
-   │          → learned how to build the thing the story runs on  │
-   │                                                               │
-   │  NOW     Building real-time, media-centric web products       │
-   │          where the product itself is the narrative.           │
-   └─────────────────────────────────────────────────────────────┘
++-------------------------------------------------------------------+
+|  ACT I   Communication University of China                        |
+|          B.A. Broadcasting & TV Editing / Omni-media Photography  |
+|          -> learned how to frame a story for an audience          |
+|                                                                   |
+|  ACT II  University of California, Irvine                         |
+|          Master of Software Engineering (MSWE)                    |
+|          -> learned how to build the thing the story runs on      |
+|                                                                   |
+|  NOW     Building real-time, media-centric web products           |
+|          where the product itself is the narrative.               |
++-------------------------------------------------------------------+
 ```
 
 I spent my undergrad behind cameras and in edit bays, thinking about pacing, framing and what an audience actually feels. Graduate school at UCI turned that into engineering: I now build interactive, real-time products and care just as much about the user's experience as about the architecture underneath it.
