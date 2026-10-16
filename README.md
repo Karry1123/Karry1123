@@ -19,7 +19,7 @@
 ```text
 +-------------------------------------------------------------------+
 |  ACT I   Communication University of China                        |
-|          B.A. Broadcasting & TV Editing / Omni-media Photography  |
+|          B.A. Broadcasting & TV Editing (Omni-media Photography)  |
 |          -> learned how to frame a story for an audience          |
 |                                                                   |
 |  ACT II  University of California, Irvine                         |
