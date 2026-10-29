@@ -1,10 +1,9 @@
-"""Generate profile cards (rated stats, top languages, open-source PRs) as SVG.
+"""Generate profile cards (rated stats, top languages) as SVG.
 
 The rank uses the same formula as github-readme-stats (MIT licensed):
 weighted CDFs of commits, PRs, issues, reviews, stars and followers.
 """
 import json, math, os, sys, urllib.request
-from collections import defaultdict
 from html import escape
 
 USER = os.environ.get("GH_USER", "Karry1123")
@@ -146,37 +145,8 @@ for i, (name, (v, color)) in enumerate(top):
                f'{escape(name)} <tspan fill="{MUTED}">{100*v/total:.1f}%</tspan></text>')
 langs_svg = frame(350, 200, "Most Used Languages", bar + legend)
 
-# ---- open-source contributions (PRs to other people's public repos) ----
-ext = defaultdict(lambda: {"total": 0, "merged": 0, "stars": 0})
-for p in public_prs:
-    repo = p["repository"]
-    if repo["owner"]["login"].lower() == USER.lower():
-        continue
-    e = ext[repo["nameWithOwner"]]
-    e["total"] += 1
-    e["merged"] += p["state"] == "MERGED"
-    e["stars"] = repo["stargazerCount"]
-top_ext = sorted(ext.items(), key=lambda kv: (-kv[1]["stars"], -kv[1]["merged"], -kv[1]["total"]))[:6]
-
-
-def kfmt(n):
-    return f"{n/1000:.1f}k" if n >= 1000 else str(n)
-
-
-h = 72 + 26 * max(len(top_ext), 1)
-inner = (txt(24, 58, "Repository", MUTED, 12) + txt(330, 58, "Stars", MUTED, 12, anchor="end")
-         + txt(426, 58, "PRs (merged)", MUTED, 12, anchor="end"))
-for i, (name, e) in enumerate(top_ext):
-    y = 86 + i * 26
-    inner += (f'<circle cx="30" cy="{y-5}" r="3" fill="{GOLD}"/>' + txt(44, y, name, size=13)
-              + txt(330, y, "★ " + kfmt(e["stars"]), GOLD if e["stars"] >= 1000 else MUTED, 13, anchor="end")
-              + txt(426, y, f'{e["total"]} ({e["merged"]})', TEXT, 13, 600, anchor="end"))
-if not top_ext:
-    inner += txt(24, 86, "No external pull requests yet", MUTED, 13)
-oss_svg = frame(450, h, "Open-source Contributions", inner)
-
 os.makedirs(OUT, exist_ok=True)
-for fn, svg in (("stats.svg", stats_svg), ("top-langs.svg", langs_svg), ("oss.svg", oss_svg)):
+for fn, svg in (("stats.svg", stats_svg), ("top-langs.svg", langs_svg)):
     with open(os.path.join(OUT, fn), "w", encoding="utf-8", newline="\n") as f:
         f.write(svg)
-print(s, f"rank={level} top {percentile:.1f}%", [(n, dict(e)) for n, e in top_ext])
+print(s, f"rank={level} top {percentile:.1f}%")
