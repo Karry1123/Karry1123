@@ -96,8 +96,8 @@ A web recreation of the DingLong mahjong table: PvE against AI, 2–4 player PvP
 
 <div align="center">
 
-<img src="https://github-readme-stats.vercel.app/api?username=Karry1123&show_icons=true&theme=tokyonight&hide_border=true&bg_color=0f172a&title_color=c7a555&icon_color=c7a555" height="165" alt="GitHub stats" />
-<img src="https://github-readme-stats.vercel.app/api/top-langs/?username=Karry1123&layout=compact&theme=tokyonight&hide_border=true&bg_color=0f172a&title_color=c7a555" height="165" alt="Top languages" />
+<img src="assets/stats.svg" height="165" alt="GitHub stats" />
+<img src="assets/top-langs.svg" height="165" alt="Top languages" />
 
 <img src="https://github-readme-streak-stats.herokuapp.com/?user=Karry1123&theme=tokyonight&hide_border=true&background=0f172a&ring=c7a555&fire=c7a555&currStreakLabel=c7a555" height="165" alt="Streak" />
 
