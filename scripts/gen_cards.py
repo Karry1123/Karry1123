@@ -1,9 +1,10 @@
-"""Generate profile cards (rated stats, top languages) as SVG.
+"""Generate profile cards (rated stats, top languages, streak) as SVG.
 
 The rank uses the same formula as github-readme-stats (MIT licensed):
 weighted CDFs of commits, PRs, issues, reviews, stars and followers.
 """
 import json, math, os, sys, urllib.request
+from datetime import date, datetime, timedelta, timezone
 from html import escape
 
 USER = os.environ.get("GH_USER", "Karry1123")
@@ -30,14 +31,18 @@ Q = """query($login:String!,$after:String,$prAfter:String){
           edges{ size node{ name color } } } } } } }"""
 
 
-def gql(after=None, pr_after=None):
-    body = json.dumps({"query": Q, "variables": {"login": USER, "after": after, "prAfter": pr_after}}).encode()
+def post(query, variables):
+    body = json.dumps({"query": query, "variables": variables}).encode()
     req = urllib.request.Request("https://api.github.com/graphql", body,
                                  {"Authorization": f"bearer {TOKEN}", "Content-Type": "application/json"})
     data = json.load(urllib.request.urlopen(req))
     if "errors" in data:
         raise SystemExit(data["errors"])
     return data["data"]["user"]
+
+
+def gql(after=None, pr_after=None):
+    return post(Q, {"login": USER, "after": after, "prAfter": pr_after})
 
 
 u = gql()
@@ -145,8 +150,80 @@ for i, (name, (v, color)) in enumerate(top):
                f'{escape(name)} <tspan fill="{MUTED}">{100*v/total:.1f}%</tspan></text>')
 langs_svg = frame(350, 200, "Most Used Languages", bar + legend)
 
+# ---- contribution streak ----
+Q_YEARS = "query($login:String!){ user(login:$login){ contributionsCollection{ contributionYears } } }"
+Q_CAL = """query($login:String!,$from:DateTime!,$to:DateTime!){ user(login:$login){
+  contributionsCollection(from:$from, to:$to){ contributionCalendar{
+    weeks{ contributionDays{ date contributionCount } } } } } }"""
+
+now = datetime.now(timezone.utc)
+counts = {}
+for year in post(Q_YEARS, {"login": USER})["contributionsCollection"]["contributionYears"]:
+    end = min(datetime(year, 12, 31, 23, 59, 59, tzinfo=timezone.utc), now)
+    cal = post(Q_CAL, {"login": USER, "from": f"{year}-01-01T00:00:00Z",
+                       "to": end.strftime("%Y-%m-%dT%H:%M:%SZ")})
+    for week in cal["contributionsCollection"]["contributionCalendar"]["weeks"]:
+        for d in week["contributionDays"]:
+            counts[date.fromisoformat(d["date"])] = d["contributionCount"]
+
+days = sorted(counts)
+total_contrib = sum(counts.values())
+first_active = next((d for d in days if counts[d]), None)
+
+longest, longest_end, run = 0, None, 0
+for d in days:
+    run = run + 1 if counts[d] else 0
+    if run > longest:
+        longest, longest_end = run, d
+
+# A day without contributions yet today does not break the current streak.
+current, cur = 0, days[-1] if days else None
+if cur is not None and not counts[cur]:
+    cur -= timedelta(days=1)
+current_end = cur
+while cur is not None and counts.get(cur, 0):
+    current += 1
+    cur -= timedelta(days=1)
+
+
+def fmt_day(d):
+    return f"{d.strftime('%b')} {d.day}, {d.year}"
+
+
+def fmt_range(n, end):
+    if not n:
+        return "No active streak"
+    start = end - timedelta(days=n - 1)
+    return fmt_day(end) if n == 1 else f"{fmt_day(start)} - {fmt_day(end)}"
+
+
+SW, SH = 724, 150
+cols = [SW / 6, SW / 2, SW * 5 / 6]
+R2, ry = 36, 64
+circ2 = 2 * math.pi * R2
+ratio = current / longest if longest else 0
+streak_inner = (
+    f'<rect x="0.5" y="0.5" width="{SW-1}" height="{SH-1}" rx="8" fill="{BG}" stroke="{BORDER}"/>'
+    f'<line x1="{SW/3:.1f}" y1="24" x2="{SW/3:.1f}" y2="{SH-24}" stroke="{BORDER}"/>'
+    f'<line x1="{SW*2/3:.1f}" y1="24" x2="{SW*2/3:.1f}" y2="{SH-24}" stroke="{BORDER}"/>'
+    + txt(cols[0], 62, total_contrib, TEXT, 28, 700, "middle")
+    + txt(cols[0], 90, "Total Contributions", GOLD, 14, 600, "middle")
+    + txt(cols[0], 112, f"Since {fmt_day(first_active)}" if first_active else "", MUTED, 12, 400, "middle")
+    + f'<circle cx="{cols[1]}" cy="{ry}" r="{R2}" fill="none" stroke="{TRACK}" stroke-width="6"/>'
+    + f'<circle cx="{cols[1]}" cy="{ry}" r="{R2}" fill="none" stroke="{GOLD}" stroke-width="6" stroke-linecap="round" '
+      f'stroke-dasharray="{circ2*ratio:.1f} {circ2:.1f}" transform="rotate(-90 {cols[1]} {ry})"/>'
+    + txt(cols[1], ry + 9, current, TEXT, 26, 700, "middle")
+    + txt(cols[1], 122, "Current Streak", GOLD, 14, 600, "middle")
+    + txt(cols[1], 140, fmt_range(current, current_end), MUTED, 12, 400, "middle")
+    + txt(cols[2], 62, longest, TEXT, 28, 700, "middle")
+    + txt(cols[2], 90, "Longest Streak", GOLD, 14, 600, "middle")
+    + txt(cols[2], 112, fmt_range(longest, longest_end), MUTED, 12, 400, "middle")
+)
+streak_svg = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{SW}" height="{SH}" '
+              f'viewBox="0 0 {SW} {SH}">{streak_inner}</svg>')
+
 os.makedirs(OUT, exist_ok=True)
-for fn, svg in (("stats.svg", stats_svg), ("top-langs.svg", langs_svg)):
+for fn, svg in (("stats.svg", stats_svg), ("top-langs.svg", langs_svg), ("streak.svg", streak_svg)):
     with open(os.path.join(OUT, fn), "w", encoding="utf-8", newline="\n") as f:
         f.write(svg)
-print(s, f"rank={level} top {percentile:.1f}%")
+print(s, f"rank={level} top {percentile:.1f}%", f"total={total_contrib} current={current} longest={longest}")
