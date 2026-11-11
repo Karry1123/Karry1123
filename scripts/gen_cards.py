@@ -59,9 +59,6 @@ while rp["hasNextPage"] or pp["hasNextPage"]:
         pp = nxt["pullRequests"]["pageInfo"]
 
 cc = u["contributionsCollection"]
-kind = "fine-grained" if TOKEN.startswith("github_pat_") else "classic" if TOKEN.startswith("ghp_") else "other"
-_r = urllib.request.urlopen(urllib.request.Request("https://api.github.com/user", headers={"Authorization": f"bearer {TOKEN}"}))
-print(f"token kind={kind} scopes={_r.headers.get('X-OAuth-Scopes')} restricted={cc['restrictedContributionsCount']}")
 s = {
     "stars": sum(r["stargazerCount"] for r in repos),
     "commits": cc["totalCommitContributions"] + cc["restrictedContributionsCount"],
