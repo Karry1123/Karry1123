@@ -17,7 +17,7 @@ jobs:
           python-version: "3.12"
       - run: python scripts/gen_cards.py assets
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_STATS_TOKEN || secrets.GITHUB_TOKEN }}
       - uses: Platane/snk/svg-only@v3
         with:
           github_user_name: ${{ github.repository_owner }}

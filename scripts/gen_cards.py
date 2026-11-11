@@ -59,12 +59,11 @@ while rp["hasNextPage"] or pp["hasNextPage"]:
         pp = nxt["pullRequests"]["pageInfo"]
 
 cc = u["contributionsCollection"]
-public_prs = [p for p in prs if not p["repository"]["isPrivate"]]
 s = {
     "stars": sum(r["stargazerCount"] for r in repos),
     "commits": cc["totalCommitContributions"] + cc["restrictedContributionsCount"],
-    "prs": len(public_prs),
-    "merged": sum(p["state"] == "MERGED" for p in public_prs),
+    "prs": len(prs),
+    "merged": sum(p["state"] == "MERGED" for p in prs),
     "reviews": cc["totalPullRequestReviewContributions"],
     "issues": u["issues"]["totalCount"],
     "contrib": u["repositoriesContributedTo"]["totalCount"],
