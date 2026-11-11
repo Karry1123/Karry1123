@@ -59,6 +59,8 @@ while rp["hasNextPage"] or pp["hasNextPage"]:
         pp = nxt["pullRequests"]["pageInfo"]
 
 cc = u["contributionsCollection"]
+kind = "fine-grained" if TOKEN.startswith("github_pat_") else "classic" if TOKEN.startswith("ghp_") else "other"
+print(f"token kind={kind} restricted={cc['restrictedContributionsCount']}")
 s = {
     "stars": sum(r["stargazerCount"] for r in repos),
     "commits": cc["totalCommitContributions"] + cc["restrictedContributionsCount"],
